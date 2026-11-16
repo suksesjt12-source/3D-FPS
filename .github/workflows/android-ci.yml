@@ -1,11 +1,15 @@
+
 name: Operation Shadow Android CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-and-test:
@@ -15,26 +19,42 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Setup Gradle 9.3.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.3.1'
 
-      - name: Run JVM & Robolectric Tests
+      - name: Generate Debug Keystore
+        run: |
+          keytool -genkeypair -noprompt \
+            -keystore debug.keystore \
+            -storetype JKS \
+            -storepass android \
+            -keypass android \
+            -alias android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+      - name: Run Unit Tests
         run: gradle :app:testDebugUnitTest
 
       - name: Build Debug APK
         run: gradle :app:assembleDebug
 
-      - name: Upload Debug APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: operation-shadow-debug-apk
+          name: Operation-Shadow-Debug-APK
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
