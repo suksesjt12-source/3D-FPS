@@ -1,0 +1,6 @@
+{
+  "name": "Operation Shadow",
+  "description": "A 3D first-person sci-fi action stealth game set in the 2089 AETHER-9 research facility, built natively for Android with OpenGL ES 3.0 and Jetpack Compose.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
