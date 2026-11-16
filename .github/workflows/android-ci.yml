@@ -23,30 +23,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Download repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Install Java JDK 17
-      - name: Setup JDK 17
+      - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
-      # 3. Install Android SDK
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
 
-      # 4. Install Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '9.3.1'
 
-      # 5. Generate Debug Keystore
       - name: Generate Debug Keystore
         run: |
           keytool -genkeypair -noprompt \
@@ -60,19 +55,15 @@ jobs:
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
 
-      # 6. Check Gradle
       - name: Check Gradle Version
         run: gradle --version
 
-      # 7. Run Unit Tests
       - name: Run Unit Tests
         run: gradle --no-daemon :app:testDebugUnitTest
 
-      # 8. Build APK
       - name: Build Debug APK
         run: gradle --no-daemon :app:assembleDebug
 
-      # 9. Verify APK
       - name: Verify APK
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
@@ -86,7 +77,6 @@ jobs:
           echo "APK successfully generated:"
           ls -lh "$APK"
 
-      # 10. Upload APK
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
